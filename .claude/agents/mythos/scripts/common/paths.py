@@ -34,7 +34,7 @@ def project_root(start: Path | None = None) -> Path:
     # that ~/.claude is never treated as a project root.
     candidates: list[Path] = []
     for candidate in (here, *here.parents):
-        if candidate == home or not _is_relative_to(candidate, home):
+        if candidate == home or not candidate.is_relative_to(home):
             # We've reached home or gone above it — stop without adding.
             break
         candidates.append(candidate)
@@ -47,15 +47,6 @@ def project_root(start: Path | None = None) -> Path:
         f"No .claude/ found in {here} or any parent up to {home}. "
         "Are you running from a Mythos-enabled repo?"
     )
-
-
-def _is_relative_to(path: Path, base: Path) -> bool:
-    """Return True if `path` is strictly under `base` (not equal to base)."""
-    try:
-        path.relative_to(base)
-        return path != base
-    except ValueError:
-        return False
 
 
 def mythos_dir() -> Path:
@@ -98,7 +89,7 @@ def assert_safe_write(target: Path, base: Path) -> None:
         resolved = target.resolve()
         base_resolved = base.resolve()
         resolved.relative_to(base_resolved)
-    except (ValueError, OSError):
+    except ValueError:
         raise UnsafePathError(
             f"Path {target} resolves outside the allowed base {base}"
         )

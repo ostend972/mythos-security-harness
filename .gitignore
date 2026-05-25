@@ -24,6 +24,10 @@ Thumbs.db
 
 # Vendor / external
 ruvector.db
+Anthropic-Cybersecurity-Skills-main/
+
+# Operator-local state
+.claude/agents/mythos/.acknowledged
 
 # Mythos Plan 1 additions
 .coverage

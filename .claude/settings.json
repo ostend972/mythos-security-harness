@@ -1,0 +1,39 @@
+{
+  "env": {
+    "CLAUDE_CODE_SUBAGENT_MODEL": "claude-opus-4-7",
+    "CLAUDE_CODE_EFFORT_LEVEL": "max",
+    "MYTHOS_DOCKER_IMAGE": "mythos-multilang:1.0.0",
+    "MYTHOS_PARALLEL_HUNTERS": "50",
+    "MYTHOS_HUNTER_TIMEOUT_SEC": "600",
+    "MYTHOS_GAPFILL_MAX_ITER": "3",
+    "MYTHOS_FEEDBACK_MAX_ITER": "1"
+  },
+  "hooks": {
+    "SubagentStart": [
+      {
+        "matcher": "mythos-.*",
+        "hooks": [
+          { "type": "command", "command": "python .claude/agents/mythos/scripts/agent_start.py" }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          { "type": "command", "command": "python .claude/agents/mythos/scripts/cleanup_orphans.py" }
+        ]
+      }
+    ]
+  },
+  "permissions": {
+    "deny": [
+      "Bash(rm -rf /*)",
+      "Bash(rm -rf ~*)",
+      "Bash(rm -rf $HOME*)",
+      "Bash(chmod 777 /*)",
+      "Bash(sudo *)",
+      "Bash(su -*)",
+      "Bash(docker run --privileged *)"
+    ]
+  }
+}

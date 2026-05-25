@@ -1,0 +1,62 @@
+# Mythos Preview — curated cybersecurity skills whitelist
+# Format: one skill name per line; comments allowed (#); blank lines ignored.
+# Source: Anthropic-Cybersecurity-Skills (community repo, Apache 2.0).
+# Audit on each install: verifies frontmatter shape, no obvious injection
+# patterns, no <script>/<eval> tags, no fetch URLs that aren't allowlisted.
+
+# === Web exploitation (hunter-loaded by class) ===
+exploiting-sql-injection-vulnerabilities
+exploiting-sql-injection-with-sqlmap
+exploiting-nosql-injection-vulnerabilities
+exploiting-api-injection-vulnerabilities
+exploiting-server-side-request-forgery
+exploiting-insecure-deserialization
+exploiting-race-condition-vulnerabilities
+exploiting-prototype-pollution-in-javascript
+exploiting-template-injection-vulnerabilities
+exploiting-type-juggling-vulnerabilities
+exploiting-jwt-algorithm-confusion-attack
+exploiting-idor-vulnerabilities
+exploiting-http-request-smuggling
+exploiting-mass-assignment-in-rest-apis
+exploiting-oauth-misconfiguration
+exploiting-websocket-vulnerabilities
+exploiting-broken-function-level-authorization
+exploiting-excessive-data-exposure-in-api
+exploiting-broken-link-hijacking
+
+# === Mobile/deeplink ===
+exploiting-deeplink-vulnerabilities
+exploiting-insecure-data-storage-in-mobile
+
+# === Memory bugs ===
+analyzing-heap-spray-exploitation
+
+# === Recon (mythos-recon) ===
+conducting-external-reconnaissance-with-osint
+implementing-threat-modeling-with-mitre-attack
+performing-threat-modeling-with-owasp-threat-dragon
+
+# === Validate (mythos-validate) ===
+analyzing-cyber-kill-chain
+
+# === Trace (mythos-trace) ===
+analyzing-sbom-for-supply-chain-vulnerabilities
+
+# === Explorer (fuzzing) ===
+performing-fuzzing-with-aflplusplus
+implementing-fuzz-testing-in-cicd-with-aflplusplus
+performing-api-fuzzing-with-restler
+
+# === Supplementary detection skills (validate phase) ===
+detecting-sql-injection-via-waf-logs
+detecting-serverless-function-injection
+detecting-supply-chain-attacks-in-ci-cd
+
+# === Optional — auth / lateral movement (for chains) ===
+exploiting-active-directory-with-bloodhound
+exploiting-kerberoasting-with-impacket
+exploiting-vulnerabilities-with-metasploit-framework
+analyzing-supply-chain-malware-artifacts
+detecting-process-injection-techniques
+exploiting-ipv6-vulnerabilities

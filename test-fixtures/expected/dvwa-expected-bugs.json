@@ -1,0 +1,18 @@
+{
+  "fixture": "dvwa",
+  "language": "php",
+  "expected_bugs": [
+    {"file": "vulnerabilities/sqli/source/low.php", "function": "n/a", "class": "sql-injection", "severity": "critical"},
+    {"file": "vulnerabilities/sqli_blind/source/low.php", "function": "n/a", "class": "sql-injection", "severity": "high"},
+    {"file": "vulnerabilities/exec/source/low.php", "function": "n/a", "class": "command-injection", "severity": "critical"},
+    {"file": "vulnerabilities/csrf/source/low.php", "function": "n/a", "class": "type-juggling", "severity": "medium"},
+    {"file": "vulnerabilities/fi/source/low.php", "function": "n/a", "class": "command-injection", "severity": "high"},
+    {"file": "vulnerabilities/upload/source/low.php", "function": "n/a", "class": "command-injection", "severity": "high"},
+    {"file": "vulnerabilities/xss_r/source/low.php", "function": "n/a", "class": "type-juggling", "severity": "medium"},
+    {"file": "vulnerabilities/xss_s/source/low.php", "function": "n/a", "class": "type-juggling", "severity": "high"},
+    {"file": "vulnerabilities/weak_id/source/low.php", "function": "n/a", "class": "idor", "severity": "high"},
+    {"file": "vulnerabilities/captcha/source/low.php", "function": "n/a", "class": "type-juggling", "severity": "medium"}
+  ],
+  "recall_target": 0.8,
+  "precision_target": 0.7
+}

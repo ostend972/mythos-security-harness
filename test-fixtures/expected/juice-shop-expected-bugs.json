@@ -1,0 +1,20 @@
+{
+  "fixture": "juice-shop",
+  "language": "typescript",
+  "expected_bugs": [
+    {"file": "routes/login.ts", "function": "login", "class": "sql-injection", "severity": "critical"},
+    {"file": "routes/likeProductReviews.ts", "function": "likeProductReviews", "class": "nosql-injection", "severity": "high"},
+    {"file": "routes/dataExport.ts", "function": "dataExport", "class": "data-exposure-api", "severity": "high"},
+    {"file": "routes/userProfile.ts", "function": "userProfile", "class": "ssti", "severity": "critical"},
+    {"file": "routes/profileImageUrlUpload.ts", "function": "profileImageUrlUpload", "class": "ssrf", "severity": "high"},
+    {"file": "routes/redirect.ts", "function": "redirect", "class": "type-juggling", "severity": "medium"},
+    {"file": "lib/insecurity.ts", "function": "verify", "class": "jwt-confusion", "severity": "high"},
+    {"file": "routes/showProductReviews.ts", "function": "showProductReviews", "class": "idor", "severity": "high"},
+    {"file": "routes/updateUserProfile.ts", "function": "updateUserProfile", "class": "mass-assignment", "severity": "high"},
+    {"file": "routes/restoreBasket.ts", "function": "restoreBasket", "class": "race-condition", "severity": "medium"},
+    {"file": "routes/coupon.ts", "function": "coupon", "class": "race-condition", "severity": "high"},
+    {"file": "routes/order.ts", "function": "order", "class": "bfla", "severity": "high"}
+  ],
+  "recall_target": 0.8,
+  "precision_target": 0.7
+}

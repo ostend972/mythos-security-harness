@@ -1,0 +1,15 @@
+{
+  "fixture": "c-vuln-samples",
+  "language": "c",
+  "expected_bugs": [
+    {"file": "src/uaf.c", "function": "main", "class": "uaf", "severity": "critical"},
+    {"file": "src/oob_read.c", "function": "main", "class": "oob-rw", "severity": "high"},
+    {"file": "src/oob_write.c", "function": "main", "class": "oob-rw", "severity": "critical"},
+    {"file": "src/double_free.c", "function": "main", "class": "double-free", "severity": "high"},
+    {"file": "src/format_string.c", "function": "main", "class": "format-string", "severity": "high"},
+    {"file": "src/stack_overflow.c", "function": "vulnerable", "class": "oob-rw", "severity": "critical"}
+  ],
+  "recall_target": 0.7,
+  "precision_target": 0.7,
+  "notes": "Memory bugs are harder to chain; 70% recall is the V1 floor."
+}

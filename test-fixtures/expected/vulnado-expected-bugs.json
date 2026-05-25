@@ -1,0 +1,13 @@
+{
+  "fixture": "vulnado",
+  "language": "java",
+  "expected_bugs": [
+    {"file": "src/main/java/com/scalesec/vulnado/User.java", "function": "fetch", "class": "sql-injection", "severity": "critical"},
+    {"file": "src/main/java/com/scalesec/vulnado/CommandsController.java", "function": "commandInjection", "class": "command-injection", "severity": "critical"},
+    {"file": "src/main/java/com/scalesec/vulnado/CookieController.java", "function": "value", "class": "deserialization", "severity": "critical"},
+    {"file": "src/main/java/com/scalesec/vulnado/LinksController.java", "function": "links", "class": "ssrf", "severity": "high"},
+    {"file": "src/main/java/com/scalesec/vulnado/LoginController.java", "function": "login", "class": "sql-injection", "severity": "critical"}
+  ],
+  "recall_target": 0.8,
+  "precision_target": 0.7
+}

@@ -1,0 +1,15 @@
+{
+  "fixture": "nodegoat",
+  "language": "javascript",
+  "expected_bugs": [
+    {"file": "app/data/profile-dao.js", "function": "updateUser", "class": "nosql-injection", "severity": "critical"},
+    {"file": "app/data/profile-dao.js", "function": "getUser", "class": "nosql-injection", "severity": "high"},
+    {"file": "app/routes/profile.js", "function": "handleProfileUpdate", "class": "mass-assignment", "severity": "high"},
+    {"file": "app/routes/research.js", "function": "displayResearch", "class": "ssrf", "severity": "high"},
+    {"file": "app/data/allocations-dao.js", "function": "update", "class": "idor", "severity": "high"},
+    {"file": "app/routes/index.js", "function": "n/a", "class": "type-juggling", "severity": "medium"},
+    {"file": "config/config.js", "function": "n/a", "class": "data-exposure-api", "severity": "medium"}
+  ],
+  "recall_target": 0.8,
+  "precision_target": 0.7
+}

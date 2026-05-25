@@ -1,0 +1,16 @@
+{
+  "fixture": "webgoat",
+  "language": "java",
+  "expected_bugs": [
+    {"file": "src/main/java/org/owasp/webgoat/lessons/sqlinjection/", "function": "various", "class": "sql-injection", "severity": "critical"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/idor/", "function": "various", "class": "idor", "severity": "high"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/jwt/", "function": "various", "class": "jwt-confusion", "severity": "high"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/ssrf/", "function": "various", "class": "ssrf", "severity": "high"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/deserialization/", "function": "various", "class": "deserialization", "severity": "critical"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/missingac/", "function": "various", "class": "bfla", "severity": "high"},
+    {"file": "src/main/java/org/owasp/webgoat/lessons/passwordreset/", "function": "various", "class": "idor", "severity": "high"}
+  ],
+  "recall_target": 0.8,
+  "precision_target": 0.7,
+  "notes": "WebGoat exercises are organized as lesson packages; file paths refer to the package root."
+}

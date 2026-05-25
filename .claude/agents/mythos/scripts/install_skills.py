@@ -46,6 +46,17 @@ def parse_allowlist(path: Path) -> list[str]:
     return names
 
 
+def _strip_code_fences(text: str) -> str:
+    """Remove the contents of fenced code blocks (```...```) from text.
+
+    Skill files for exploit education legitimately include payloads like
+    `<script>` and `eval(` inside code blocks for documentation purposes.
+    The audit must only inspect *prose* (instructions outside code fences),
+    not the example payloads themselves.
+    """
+    return re.sub(r"```[\s\S]*?```", "", text)
+
+
 def audit_skill(skill_dir: Path) -> tuple[bool, str | None]:
     """Return (ok, reason). ok=False means do not install."""
     skill_md = skill_dir / "SKILL.md"
@@ -59,9 +70,11 @@ def audit_skill(skill_dir: Path) -> tuple[bool, str | None]:
     if len(parts) < 3:
         return False, "malformed frontmatter (no closing '---')"
     body = parts[2]
+    # Inspect only prose (outside code fences), not example payloads
+    prose = _strip_code_fences(body)
     for pattern in DANGEROUS_BODY_PATTERNS:
-        if pattern.search(body):
-            return False, f"body matched dangerous pattern: {pattern.pattern!r}"
+        if pattern.search(prose):
+            return False, f"prose matched dangerous pattern: {pattern.pattern!r}"
     return True, None
 
 

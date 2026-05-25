@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/task.schema.json",
+  "title": "Mythos Hunt Task",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["task_id", "class", "scope", "subsystem", "trust_boundary", "priority", "status"],
+  "properties": {
+    "task_id": { "type": "string", "pattern": "^T-[A-Z0-9]{4,}$" },
+    "class": { "type": "string", "minLength": 1 },
+    "scope": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Format: <file>:<function>"
+    },
+    "subsystem": { "type": "string", "minLength": 1 },
+    "trust_boundary": { "type": "string", "minLength": 1 },
+    "priority": { "type": "integer", "minimum": 1, "maximum": 5 },
+    "status": {
+      "type": "string",
+      "enum": ["pending", "in_progress", "completed", "failed", "timeout"]
+    },
+    "source": {
+      "type": "string",
+      "enum": ["recon", "gapfill", "feedback-loop"]
+    },
+    "consumer_repo": { "type": "string" }
+  }
+}

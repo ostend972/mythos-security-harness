@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/finding.schema.json",
+  "title": "Mythos Finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "finding_id", "task_id", "class", "file", "line",
+    "function", "severity", "hypothesis", "poc_dir",
+    "poc_log", "docker_image", "hunter_id", "confidence",
+    "created_at"
+  ],
+  "properties": {
+    "finding_id": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" },
+    "task_id": { "type": "string", "pattern": "^T-[A-Z0-9]{4,}$" },
+    "class": {
+      "type": "string",
+      "enum": [
+        "sql-injection", "nosql-injection", "command-injection", "ssrf",
+        "deserialization", "race-condition", "prototype-pollution", "ssti",
+        "type-juggling", "jwt-confusion", "idor", "http-smuggling",
+        "mass-assignment", "oauth", "websocket", "bfla", "data-exposure-api",
+        "heap-corruption", "uaf", "oob-rw", "double-free", "format-string",
+        "deeplink"
+      ]
+    },
+    "file": { "type": "string", "minLength": 1, "pattern": "^[^\\u0000]+$" },
+    "line": { "type": "integer", "minimum": 1 },
+    "function": { "type": "string", "minLength": 1 },
+    "severity": {
+      "type": "string",
+      "enum": ["critical", "high", "medium", "low", "info"]
+    },
+    "hypothesis": { "type": "string", "minLength": 10, "maxLength": 5000 },
+    "poc_dir": { "type": "string", "pattern": "^poc/F-[A-Z0-9]{6,}/$" },
+    "poc_log": { "type": "string", "maxLength": 50000 },
+    "docker_image": { "type": "string", "minLength": 1 },
+    "hunter_id": { "type": "string", "pattern": "^hunter-[0-9]{2,}$" },
+    "confidence": {
+      "type": "string",
+      "enum": ["poc-confirmed"],
+      "description": "ONLY accepted value — enforces 'no PoC = drop' policy at the schema level"
+    },
+    "created_at": { "type": "string", "format": "date-time" },
+    "chain": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" },
+      "description": "If this finding is part of an exploit chain, IDs of primitive findings"
+    }
+  }
+}

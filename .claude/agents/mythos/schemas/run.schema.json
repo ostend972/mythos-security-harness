@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/run.schema.json",
+  "title": "Mythos Run State",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "version", "target_path", "started_at", "current_phase"],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "target_path": { "type": "string", "minLength": 1 },
+    "started_at": { "type": "string", "format": "date-time" },
+    "current_phase": {
+      "type": "string",
+      "enum": ["init", "recon", "hunt", "validate", "gapfill", "dedupe", "trace", "feedback", "report", "done"]
+    },
+    "current_phase_started_at": { "type": "string", "format": "date-time" },
+    "phases_completed": { "type": "array", "items": { "type": "string" } },
+    "iteration_counts": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "gapfill": { "type": "integer", "minimum": 0 },
+        "feedback": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "hash_chain": { "type": "string", "pattern": "^sha256:[a-f0-9]{64}$" },
+    "finished_at": { "type": "string", "format": "date-time" }
+  }
+}

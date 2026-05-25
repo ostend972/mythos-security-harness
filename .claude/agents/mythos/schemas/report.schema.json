@@ -1,0 +1,31 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/report.schema.json",
+  "title": "Mythos Final Report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["run_id", "version", "target_path", "generated_at", "clusters", "metrics"],
+  "properties": {
+    "run_id": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$" },
+    "target_path": { "type": "string", "minLength": 1 },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cluster_id", "severity", "reachable", "primary_finding"],
+        "properties": {
+          "cluster_id": { "type": "string", "pattern": "^C-[A-Z0-9]{6,}$" },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low", "info"] },
+          "reachable": { "type": "boolean" },
+          "primary_finding": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" },
+          "poc_path": { "type": "string" },
+          "summary": { "type": "string", "maxLength": 2000 }
+        }
+      }
+    },
+    "metrics": { "type": "object", "additionalProperties": true }
+  }
+}

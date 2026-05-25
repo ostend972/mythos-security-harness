@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/dedup-cluster.schema.json",
+  "title": "Mythos Dedup Cluster Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["clusters", "generated_at"],
+  "properties": {
+    "clusters": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["cluster_id", "root_cause", "primary_finding", "highest_severity"],
+        "properties": {
+          "cluster_id": { "type": "string", "pattern": "^C-[A-Z0-9]{6,}$" },
+          "root_cause": { "type": "string", "minLength": 10 },
+          "primary_finding": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" },
+          "variant_findings": {
+            "type": "array",
+            "items": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" }
+          },
+          "highest_severity": {
+            "type": "string",
+            "enum": ["critical", "high", "medium", "low", "info"]
+          }
+        }
+      }
+    },
+    "generated_at": { "type": "string", "format": "date-time" }
+  }
+}

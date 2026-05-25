@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/validated.schema.json",
+  "title": "Mythos Validated Finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["finding_id", "verdict", "validator_notes", "validated_at"],
+  "properties": {
+    "finding_id": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" },
+    "verdict": { "type": "string", "enum": ["keep", "drop"] },
+    "validator_notes": { "type": "string", "maxLength": 10000 },
+    "independent_poc_path": { "type": "string" },
+    "replayed_hunter_poc": { "type": "boolean" },
+    "drop_reason": { "type": "string", "maxLength": 1000 },
+    "validated_at": { "type": "string", "format": "date-time" }
+  }
+}

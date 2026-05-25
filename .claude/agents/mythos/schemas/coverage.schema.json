@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/coverage.schema.json",
+  "title": "Mythos Hunter Coverage Record",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["hunter_id", "task_id", "task_class", "task_scope", "verdict"],
+  "properties": {
+    "hunter_id": { "type": "string", "pattern": "^hunter-[0-9]{2,}$" },
+    "task_id": { "type": "string", "pattern": "^T-[A-Z0-9]{4,}$" },
+    "task_class": { "type": "string", "minLength": 1 },
+    "task_scope": { "type": "string", "minLength": 1 },
+    "files_read": { "type": "array", "items": { "type": "string" } },
+    "functions_analyzed": { "type": "array", "items": { "type": "string" } },
+    "classes_evaluated": { "type": "array", "items": { "type": "string" } },
+    "partial_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["location", "reason"],
+        "properties": {
+          "location": { "type": "string" },
+          "reason": { "type": "string" }
+        }
+      }
+    },
+    "findings_produced": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^F-[A-Z0-9]{6,}$" }
+    },
+    "iterations_used": { "type": "integer", "minimum": 0 },
+    "verdict": {
+      "type": "string",
+      "enum": ["completed", "timeout", "failed", "no_findings"]
+    }
+  }
+}

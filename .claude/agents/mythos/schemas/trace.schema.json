@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mythos.local/schemas/trace.schema.json",
+  "title": "Mythos Reachability Trace",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["cluster_id", "consumer_repo", "reachable", "traced_at"],
+  "properties": {
+    "cluster_id": { "type": "string", "pattern": "^C-[A-Z0-9]{6,}$" },
+    "consumer_repo": { "type": "string", "minLength": 1 },
+    "reachable": { "type": "boolean" },
+    "entry_points": { "type": "array", "items": { "type": "string" } },
+    "call_chain": { "type": "array", "items": { "type": "string" } },
+    "constraints": { "type": "array", "items": { "type": "string" } },
+    "confidence": { "type": "string", "enum": ["high", "medium", "low"] },
+    "traced_at": { "type": "string", "format": "date-time" }
+  }
+}

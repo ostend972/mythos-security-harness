@@ -1,0 +1,48 @@
+#include <tunables/global>
+
+profile mythos-mythos flags=(attach_disconnected,mediate_deleted) {
+  #include <abstractions/base>
+
+  network inet stream,
+  network inet6 stream,
+  network inet dgram,
+  network inet6 dgram,
+  network unix stream,
+
+  capability,
+
+  file,
+  umount,
+
+  deny @{PROC}/* w,                  # deny writes to /proc
+  deny @{PROC}/sys/[^k]* w,
+  deny @{PROC}/sysrq-trigger rwklx,
+  deny @{PROC}/mem rwklx,
+  deny @{PROC}/kmem rwklx,
+  deny @{PROC}/kcore rwklx,
+  deny mount,                        # deny mount syscall
+  deny /sys/[^f]*/** wklx,
+  deny /sys/f[^s]*/** wklx,
+  deny /sys/fs/[^c]*/** wklx,
+  deny /sys/fs/c[^g]*/** wklx,
+  deny /sys/fs/cg[^r]*/** wklx,
+  deny /sys/firmware/** rwklx,
+  deny /sys/kernel/security/** rwklx,
+
+  deny /etc/shadow r,
+  deny /etc/sudoers r,
+  deny /root/** rwklx,
+  deny /home/[^n]*/** rwklx,         # block /home/<other>/, allow nobody-mythos home
+
+  # Allow read access to libraries and binaries
+  /usr/** rmix,
+  /lib/** rmix,
+  /lib64/** rmix,
+  /bin/** rmix,
+  /sbin/** rmix,
+
+  # Allow read/exec on /work (mounted PoC)
+  /work/** r,
+  /work-rw/** rwk,
+  /tmp/** rwk,
+}

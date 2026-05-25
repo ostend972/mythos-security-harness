@@ -21,3 +21,11 @@ python .claude/agents/mythos/scripts/preflight.py
 docker build -t mythos-multilang:1.0.0 .claude/agents/mythos/docker/
 pytest tests/ -v
 ```
+
+## (Linux only) Loading the AppArmor profile
+
+```bash
+sudo apparmor_parser -r .claude/agents/mythos/docker/apparmor-mythos
+```
+
+This is best-effort: if AppArmor isn't installed, Mythos skips this layer and continues with seccomp + cap-drop + namespaces.

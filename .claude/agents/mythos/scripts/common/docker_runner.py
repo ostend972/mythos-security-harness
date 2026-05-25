@@ -10,6 +10,7 @@ run_poc_sandboxed (actually invokes Docker).
 from __future__ import annotations
 
 import dataclasses
+import re
 from pathlib import Path
 from typing import Optional
 
@@ -17,6 +18,24 @@ import docker
 from docker.types import Ulimit
 
 from common import platform_utils
+
+
+def _to_daemon_path(p: Path) -> str:
+    """Convert a host path to one the Docker daemon can read.
+
+    On Windows with Docker Desktop (WSL2 backend), the daemon runs inside a
+    Linux VM and accesses Windows files via /mnt/c/... — passing a raw
+    `C:\\path\\to\\file` makes the daemon mis-parse the value as inline JSON.
+    On Linux/Mac native, no conversion is needed.
+    """
+    resolved = str(p.resolve())
+    if platform_utils.is_windows_host():
+        m = re.match(r"^([A-Za-z]):[\\/](.*)$", resolved)
+        if m:
+            drive = m.group(1).lower()
+            rest = m.group(2).replace("\\", "/")
+            return f"/mnt/{drive}/{rest}"
+    return resolved
 
 
 @dataclasses.dataclass
@@ -30,6 +49,19 @@ class RunResult:
     error: Optional[str] = None
 
 
+def load_seccomp_inline(profile_path: Path) -> str:
+    """Read and compact a seccomp JSON profile for inline embedding.
+
+    Docker Desktop on Windows (WSL2 backend) does not reliably read seccomp
+    profile files from Windows paths or /mnt/c/... — it returns
+    "Decoding seccomp profile failed: invalid character ..." errors. We pass
+    the JSON content inline (Docker accepts both forms; inline is portable).
+    """
+    import json as _json
+    content = profile_path.read_text(encoding="utf-8")
+    return _json.dumps(_json.loads(content), separators=(",", ":"))
+
+
 def build_run_kwargs(
     image: str,
     poc_dir: Path,
@@ -38,15 +70,25 @@ def build_run_kwargs(
     finding_id: str,
     allow_callback: bool,
     apparmor: bool,
-    seccomp_profile_path: Path,
+    seccomp_profile_path: Path | None = None,
+    seccomp_inline: str | None = None,
 ) -> dict:
     """Build the kwargs for docker-py containers.run() with hardening applied.
 
     Pure function — no side effects, no Docker API calls. Safe to test in isolation.
+
+    Provide ONE of:
+        seccomp_profile_path: path to a JSON file (read and inlined)
+        seccomp_inline: pre-computed compact JSON string
+
+    Both default to None which results in an empty seccomp profile reference
+    (`seccomp=`) — only useful for tests that don't exercise the daemon.
     """
+    if seccomp_inline is None and seccomp_profile_path is not None:
+        seccomp_inline = load_seccomp_inline(seccomp_profile_path)
     security_opt = [
         "no-new-privileges=true",
-        f"seccomp={seccomp_profile_path.resolve()}",
+        f"seccomp={seccomp_inline or ''}",
     ]
     if apparmor:
         security_opt.append("apparmor=mythos-mythos")
@@ -66,7 +108,7 @@ def build_run_kwargs(
         "security_opt": security_opt,
         "cap_drop": ["ALL"],
         "read_only": True,
-        "user": "65534:65534",
+        "user": "1000:1000",
         "cgroupns": "private",
 
         # Resource limits
@@ -76,14 +118,20 @@ def build_run_kwargs(
         "cpu_quota": 100000,  # = 1 CPU
         "pids_limit": 100,
         "ulimits": [
-            Ulimit(name="nofile", soft=64, hard=64),
-            Ulimit(name="nproc", soft=50, hard=50),
+            # nproc=200 still protects against fork-bombs while allowing the
+            # normal shell-toolchain (bash + timeout + gcc + ...) to function.
+            # nofile=256 is enough for typical compiles; pids_limit=100 provides
+            # the harder cgroup-level bound.
+            Ulimit(name="nofile", soft=256, hard=256),
+            Ulimit(name="nproc", soft=200, hard=200),
         ],
 
         # Network
         "network_mode": network_mode,
 
-        # Mounts
+        # Mounts — bind source uses host path (Docker Desktop translates to WSL2
+        # mounts automatically). Only `seccomp` needs special daemon-path
+        # handling because it's parsed by the daemon directly, not bind-mounted.
         "volumes": {
             str(poc_dir.resolve()): {"bind": "/work", "mode": "ro"},
         },
@@ -133,16 +181,36 @@ def run_poc_sandboxed(
 
     try:
         client = docker.from_env()
-        output = client.containers.run(**kwargs)
-        stdout = output.decode("utf-8", errors="replace") if isinstance(output, bytes) else str(output)
-        duration_ms = int((time.monotonic() - start) * 1000)
-        return RunResult(exit_code=0, stdout=stdout, stderr="", duration_ms=duration_ms)
-    except docker.errors.ContainerError as e:
+        # Use detach=True so we can read stdout AND stderr independently,
+        # regardless of exit code. Then wait for completion and collect logs.
+        # We must NOT pass remove=True here because the container is removed
+        # by Docker before we can read its logs; we remove manually after.
+        kwargs_detached = dict(kwargs)
+        kwargs_detached["remove"] = False
+        kwargs_detached["detach"] = True
+        # Drop sync-only kwargs (stdout/stderr) that aren't accepted in detached mode
+        kwargs_detached.pop("stdout", None)
+        kwargs_detached.pop("stderr", None)
+
+        container = client.containers.run(**kwargs_detached)
+        try:
+            wait_result = container.wait(timeout=timeout_s)
+            exit_code = int(wait_result.get("StatusCode", -1)) if isinstance(wait_result, dict) else int(wait_result)
+            stdout_bytes = container.logs(stdout=True, stderr=False)
+            stderr_bytes = container.logs(stdout=False, stderr=True)
+            stdout = stdout_bytes.decode("utf-8", errors="replace") if stdout_bytes else ""
+            stderr = stderr_bytes.decode("utf-8", errors="replace") if stderr_bytes else ""
+        finally:
+            try:
+                container.remove(v=True, force=True)
+            except Exception:
+                pass
+
         duration_ms = int((time.monotonic() - start) * 1000)
         return RunResult(
-            exit_code=e.exit_status,
-            stdout=e.stdout.decode("utf-8", errors="replace") if e.stdout else "",
-            stderr=e.stderr.decode("utf-8", errors="replace") if e.stderr else "",
+            exit_code=exit_code,
+            stdout=stdout,
+            stderr=stderr,
             duration_ms=duration_ms,
         )
     except docker.errors.APIError as e:

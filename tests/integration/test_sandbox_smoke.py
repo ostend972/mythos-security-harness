@@ -17,7 +17,8 @@ class TestSandboxSmoke:
 
         poc = tmp_path / "poc-F-smoke1"
         poc.mkdir()
-        (poc / "run.sh").write_text("echo hello-from-sandbox\n", encoding="utf-8")
+        # write_bytes forces LF endings even on Windows (text mode would inject CRLF)
+        (poc / "run.sh").write_bytes(b"echo hello-from-sandbox\n")
 
         result = run_in_sandbox(
             poc_dir=poc,
@@ -34,7 +35,7 @@ class TestSandboxSmoke:
 
         poc = tmp_path / "poc-F-smoke2"
         poc.mkdir()
-        (poc / "run.sh").write_text("exit 42\n", encoding="utf-8")
+        (poc / "run.sh").write_bytes(b"exit 42\n")
 
         result = run_in_sandbox(
             poc_dir=poc,
@@ -50,9 +51,7 @@ class TestSandboxSmoke:
 
         poc = tmp_path / "poc-F-smoke3"
         poc.mkdir()
-        (poc / "run.py").write_text(
-            "import sys; print('py-ok'); sys.exit(0)\n", encoding="utf-8"
-        )
+        (poc / "run.py").write_bytes(b"import sys; print('py-ok'); sys.exit(0)\n")
 
         result = run_in_sandbox(
             poc_dir=poc,

@@ -21,12 +21,12 @@ class TestBuildRunKwargs:
             finding_id="F-001",
             allow_callback=False,
             apparmor=False,
-            seccomp_profile_path=tmp_path / "seccomp.json",
+            seccomp_inline="{}",
         )
         # Hardening flags
         assert kwargs["cap_drop"] == ["ALL"]
         assert kwargs["read_only"] is True
-        assert kwargs["user"] == "65534:65534"
+        assert kwargs["user"] == "1000:1000"
         assert kwargs["cgroupns"] == "private"
         assert kwargs["pids_limit"] == 100
         assert kwargs["mem_limit"] == "512m"
@@ -48,7 +48,7 @@ class TestBuildRunKwargs:
             finding_id="F-001",
             allow_callback=False,
             apparmor=True,
-            seccomp_profile_path=tmp_path / "seccomp.json",
+            seccomp_inline="{}",
         )
         assert any("apparmor=mythos-mythos" in s for s in kwargs["security_opt"])
 
@@ -63,7 +63,7 @@ class TestBuildRunKwargs:
             finding_id="F-001",
             allow_callback=True,
             apparmor=False,
-            seccomp_profile_path=tmp_path / "seccomp.json",
+            seccomp_inline="{}",
         )
         assert kwargs["network_mode"] == "mythos-r1-net"
 
@@ -78,9 +78,14 @@ class TestBuildRunKwargs:
             finding_id="F-001",
             allow_callback=False,
             apparmor=False,
-            seccomp_profile_path=tmp_path / "seccomp.json",
+            seccomp_inline="{}",
         )
-        assert kwargs["volumes"][str(poc_dir.resolve())]["mode"] == "ro"
+        # The volume key may be a daemon-style path (e.g., /mnt/c/... on Windows)
+        # — check that the single mounted volume is read-only regardless of key format.
+        assert len(kwargs["volumes"]) == 1
+        mount_info = next(iter(kwargs["volumes"].values()))
+        assert mount_info["mode"] == "ro"
+        assert mount_info["bind"] == "/work"
 
     def test_tmpfs_provides_writable_work_rw(self, tmp_path):
         poc_dir = tmp_path / "poc-F-001"
@@ -93,7 +98,7 @@ class TestBuildRunKwargs:
             finding_id="F-001",
             allow_callback=False,
             apparmor=False,
-            seccomp_profile_path=tmp_path / "seccomp.json",
+            seccomp_inline="{}",
         )
         assert "/tmp" in kwargs["tmpfs"]
         assert "/work-rw" in kwargs["tmpfs"]

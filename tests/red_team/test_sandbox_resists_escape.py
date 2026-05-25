@@ -36,8 +36,11 @@ class TestSandboxResistsEscape:
         poc = _prepare_poc(tmp_path, "try_etc_passwd_read.sh")
         result = run_in_sandbox(poc_dir=poc, run_id="rt1", hunter_id="h0", finding_id="F-rt-passwd")
 
-        # Container's /etc/passwd MUST contain nobody-mythos (we created that user)
-        assert "nobody-mythos" in result.stdout
+        # Container's /etc/passwd MUST contain the `mythos` user (UID 1000) we created.
+        # Note: originally planned as nobody-mythos at UID 65534 but renamed to plain
+        # `mythos` at 1000 during finalization to avoid Debian's pre-existing nobody:nogroup
+        # entry that broke the rust toolchain install.
+        assert "mythos:" in result.stdout
         # Heuristic: container's /etc/passwd has ~25 entries; host's typically 30+
         lines = result.stdout.strip().split("\n")
         assert 5 < len(lines) < 50, f"Suspicious /etc/passwd size: {len(lines)} lines"
@@ -50,13 +53,14 @@ class TestSandboxResistsEscape:
         poc.mkdir()
         # Source + compile-and-run script
         shutil.copy(ATTEMPTS_DIR / "try_setuid.c", poc / "setuid_attempt.c")
-        (poc / "run.sh").write_text(
-            "set -e\n"
-            "cd /tmp\n"
-            "cp /work/setuid_attempt.c .\n"
-            "gcc -o setuid_attempt setuid_attempt.c\n"
-            "./setuid_attempt\n",
-            encoding="utf-8",
+        # write_bytes to force LF endings (write_text on Windows injects CRLF
+        # which breaks bash inside the Linux container).
+        (poc / "run.sh").write_bytes(
+            b"set -e\n"
+            b"cd /tmp\n"
+            b"cp /work/setuid_attempt.c .\n"
+            b"gcc -o setuid_attempt setuid_attempt.c\n"
+            b"./setuid_attempt\n"
         )
 
         result = run_in_sandbox(poc_dir=poc, run_id="rt2", hunter_id="h0", finding_id="F-rt-setuid")

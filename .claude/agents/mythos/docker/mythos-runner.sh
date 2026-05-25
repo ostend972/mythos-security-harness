@@ -2,44 +2,30 @@
 # Entrypoint for the mythos-multilang container.
 # Expects:
 #   /work     : read-only PoC directory (input)
-#   /work-rw  : writable tmpfs (output, scratch)
+#   /work-rw  : writable tmpfs (output, scratch — for compiler temp files)
 #
 # Reads /work/run.sh if present, else /work/run.* (first match).
-# Writes /work-rw/result.json with {exit_code, duration_s}.
+# Streams stdout/stderr directly so the caller (docker-py) can read them.
 
 set -u  # NO -e: we want to capture failures, not abort
 
-START_TS=$(date +%s%N)
-
 if [[ ! -d /work ]]; then
-  echo '{"error":"no /work mount"}' > /work-rw/result.json
+  echo "error: no /work mount" >&2
   exit 2
 fi
 
 if [[ -f /work/run.sh ]]; then
-  CMD="bash /work/run.sh"
+  CMD=(bash /work/run.sh)
 elif [[ -f /work/run.py ]]; then
-  CMD="python3 /work/run.py"
+  CMD=(python3 /work/run.py)
 elif [[ -f /work/run.js ]]; then
-  CMD="node /work/run.js"
+  CMD=(node /work/run.js)
 else
-  echo '{"error":"no run.{sh,py,js} found in /work"}' > /work-rw/result.json
+  echo "error: no run.{sh,py,js} found in /work" >&2
   exit 3
 fi
 
-# Capture output, timeout after 25s (container also gets killed externally at 30s)
-timeout --kill-after=2 25 $CMD > /work-rw/stdout.log 2> /work-rw/stderr.log
-EXIT_CODE=$?
-
-END_TS=$(date +%s%N)
-DURATION_MS=$(( (END_TS - START_TS) / 1000000 ))
-
-cat > /work-rw/result.json <<EOF
-{
-  "exit_code": ${EXIT_CODE},
-  "duration_ms": ${DURATION_MS},
-  "command": "${CMD}"
-}
-EOF
-
-exit ${EXIT_CODE}
+# Internal 25s timeout (container is externally killed at 30s by caller).
+# stdout and stderr stream directly to docker (no file redirect).
+timeout --kill-after=2 25 "${CMD[@]}"
+exit $?

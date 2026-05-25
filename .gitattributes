@@ -1,0 +1,2 @@
+# Force LF for shell scripts that run inside Linux containers
+tests/red_team/attempts/*.sh text eol=lf

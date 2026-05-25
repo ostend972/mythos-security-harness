@@ -29,3 +29,13 @@ sudo apparmor_parser -r .claude/agents/mythos/docker/apparmor-mythos
 ```
 
 This is best-effort: if AppArmor isn't installed, Mythos skips this layer and continues with seccomp + cap-drop + namespaces.
+
+## Building the sandbox image
+
+Once Docker Desktop is running and `docker` is on PATH:
+
+```bash
+docker build -t mythos-multilang:1.0.0 .claude/agents/mythos/docker/ -f .claude/agents/mythos/docker/Dockerfile.multilang
+```
+
+First build takes 5-10 minutes (downloads runtimes). Subsequent builds use layer cache and are much faster.

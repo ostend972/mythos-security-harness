@@ -2,7 +2,7 @@
 class_id: http-smuggling
 name: HTTP Request Smuggling
 applicable_languages: [any]
-applicable_frameworks: [nginx, apache, haproxy, traefik, varnish, cloudflare-edge]
+applicable_frameworks: [nginx, apache, haproxy, traefik, varnish, edge-cdn]
 severity_default: critical
 fp_rate_expected: 0.30
 skill: exploiting-http-request-smuggling

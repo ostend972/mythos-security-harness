@@ -1,6 +1,6 @@
 ---
 name: mythos
-description: Launches the Mythos Preview vulnerability discovery pipeline on the current or specified repository. Orchestrates 8 phases (Recon, Hunt, Validate, Gapfill, Dedupe, Trace, Feedback, Report) via specialized lead agents. Subcommands: start, status, resume, abort, clean.
+description: "Launches the Mythos Preview vulnerability discovery pipeline on the current or specified repository. Orchestrates 8 phases (Recon, Hunt, Validate, Gapfill, Dedupe, Trace, Feedback, Report) via specialized lead agents. Subcommands: start, status, resume, abort, clean."
 ---
 
 # /mythos — Vulnerability Discovery Pipeline

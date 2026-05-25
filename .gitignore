@@ -1,0 +1,26 @@
+# Mythos runtime state
+.mythos/
+!.mythos/.gitkeep
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+venv/
+.pytest_cache/
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Misc
+*.log
+.DS_Store
+Thumbs.db
+
+# Vendor / external
+ruvector.db

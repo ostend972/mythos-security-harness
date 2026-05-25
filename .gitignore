@@ -24,3 +24,11 @@ Thumbs.db
 
 # Vendor / external
 ruvector.db
+
+# Mythos Plan 1 additions
+.coverage
+htmlcov/
+.pytest_cache/
+*.egg-info/
+build/
+dist/

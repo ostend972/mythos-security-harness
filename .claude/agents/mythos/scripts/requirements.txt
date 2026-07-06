@@ -3,7 +3,7 @@ docker>=7.0.0,<8.0                       # Docker SDK
 filelock>=3.13.0,<4.0                    # Cross-platform file locking
 jsonschema[format-nongpl]>=4.20.0,<5.0   # JSON Schema Draft 2020-12 (no GPL deps)
 PyYAML>=6.0.1,<7.0                       # Parse agent frontmatter
-psutil>=5.9.0,<6.0                       # Cross-platform process management
+psutil>=5.9.8,<6.0                       # Cross-platform process management
 
 # Testing
 pytest>=8.0.0,<9.0
